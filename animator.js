@@ -1,7 +1,7 @@
 class Animator {
-    constructor(spritesheet, xStart, yStart, width, height, frameCount, frameDuration) {
+    constructor(spritesheet, xStart, yStart, width, height, frameCount, frameDuration, loop) {
         
-        Object.assign(this, {spritesheet, xStart, yStart, width, height, frameCount, frameDuration});
+        Object.assign(this, {spritesheet, xStart, yStart, width, height, frameCount, frameDuration, loop});
         
         this.elapsedTime = 0;
         this.totalTime = frameCount * frameDuration;
@@ -10,8 +10,18 @@ class Animator {
     drawFrame(tick, ctx, x, y, scale) {
 
         this.elapsedTime += tick;
+
+        if (this.isDone()) {
+            if (this.loop) {
+                this.elapsedTime -= this.totalTime;
+            } else {
+                console.log("frame drop");
+                return;
+            }
+        }
+
         let frame = this.currentFrame();
-        if (this.elapsedTime > this.totalTime) this.elapsedTime -= this.totalTime;
+        
         const frameOffset = this.width * frame;
 
         ctx.drawImage(this.spritesheet,
